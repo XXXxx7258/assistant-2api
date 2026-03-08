@@ -1,6 +1,6 @@
 services:
   assistant-2api:
-    build: .
+    image: zhigengniao/assistant-2api:latest
     ports:
       - "${API_PORT:-8080}:8080"
     env_file:
