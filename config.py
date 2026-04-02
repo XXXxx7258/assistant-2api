@@ -14,16 +14,23 @@ UPSTREAM_URL = os.getenv(
 )
 
 # OpenAI-compatible name → assistant-ui API identifier
-# Note: claude-sonnet-4.6 is disabled server-side (falls back to gpt-5.4)
 MODEL_MAP: dict[str, str] = {
-    "gpt-5.4": "openai/gpt-5.4",
-    "gpt-5-nano": "openai/gpt-5-nano",
-    "gemini-3-flash": "google/gemini-3-flash",
-    "kimi-k2.5": "moonshotai/kimi-k2.5",
-    "deepseek-v3.2": "deepseek/deepseek-v3.2",
+    # OpenAI
+    "gpt-5.4-nano": "openai/gpt-5.4-nano",
+    "gpt-5.4-mini": "openai/gpt-5.4-mini",
+    # Anthropic
+    "claude-haiku-4.5": "anthropic/claude-haiku-4-5",
+    # Google
+    "gemini-3-flash": "google-ai-studio/gemini-3-flash",
+    # xAI
+    "grok-4.1-fast": "grok/grok-4-1-fast",
+    "grok-3-mini-fast": "grok/grok-3-mini-fast",
+    # Groq
+    "llama-3.3-70b": "groq/llama-3.3-70b-versatile",
+    "qwen3-32b": "groq/qwen/qwen3-32b",
 }
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "gpt-5.4-nano"
 
 UPSTREAM_HEADERS: dict[str, str] = {
     "content-type": "application/json",

@@ -5,7 +5,7 @@
 ## 功能
 
 - 流式 & 非流式聊天补全
-- 5 个可用模型：GPT-5.4、GPT-5 Nano、Gemini 3 Flash、Kimi K2.5、Deepseek V3.2
+- 8 个可用模型：GPT-5.4 Nano/Mini、Claude Haiku 4.5、Gemini 3 Flash、Grok 4.1/3 Mini、Llama 3.3 70B、Qwen3 32B
 - 工具/函数调用（多步，最多 10 轮）
 - 图片识别（Vision）
 - System Prompt 透传
@@ -42,7 +42,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-5.4",
+    model="gpt-5.4-nano",
     messages=[{"role": "user", "content": "Hello"}],
     stream=True
 )
@@ -54,17 +54,20 @@ for chunk in response:
 
 | 名称 | model 参数 |
 |------|-----------|
-| GPT-5.4 | `gpt-5.4` |
-| GPT-5 Nano | `gpt-5-nano` |
-| Gemini 3.0 Flash | `gemini-3-flash` |
-| Kimi K2.5 | `kimi-k2.5` |
-| Deepseek V3.2 | `deepseek-v3.2` |
+| GPT-5.4 Nano | `gpt-5.4-nano` |
+| GPT-5.4 Mini | `gpt-5.4-mini` |
+| Claude Haiku 4.5 | `claude-haiku-4.5` |
+| Gemini 3 Flash | `gemini-3-flash` |
+| Grok 4.1 Fast | `grok-4.1-fast` |
+| Grok 3 Mini Fast | `grok-3-mini-fast` |
+| Llama 3.3 70B | `llama-3.3-70b` |
+| Qwen3 32B | `qwen3-32b` |
 
 ### 图片识别
 
 ```python
 response = client.chat.completions.create(
-    model="gpt-5.4",
+    model="gpt-5.4-nano",
     messages=[{
         "role": "user",
         "content": [
@@ -79,7 +82,7 @@ response = client.chat.completions.create(
 
 ```python
 response = client.chat.completions.create(
-    model="gpt-5.4",
+    model="gpt-5.4-nano",
     messages=[{"role": "user", "content": "London 天气如何？"}],
     tools=[{
         "type": "function",
