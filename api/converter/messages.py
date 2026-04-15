@@ -6,7 +6,7 @@ import json
 
 from nanoid import generate as nanoid
 
-from config import MODEL_MAP
+from config import ACTIVE_MODELS, DEFAULT_MODEL, MAX_SYSTEM_LENGTH, MODEL_MAP
 
 _ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789"
 
@@ -16,9 +16,16 @@ def _gen_id(prefix: str = "msg", size: int = 12) -> str:
 
 
 def _resolve_model(model: str) -> str:
-    """Map short model name to assistant-ui API identifier."""
+    """Map short model name to assistant-ui API identifier.
+
+    Disabled models are silently resolved to the default.
+    """
     if model in MODEL_MAP:
-        return MODEL_MAP[model]
+        info = MODEL_MAP[model]
+        if info["disabled"]:
+            return ACTIVE_MODELS[DEFAULT_MODEL]
+        return info["id"]
+    # Allow raw provider/model format pass-through
     if "/" in model:
         return model
     return f"openai/{model}"
@@ -76,24 +83,18 @@ def openai_to_ai_sdk(
 ) -> dict:
     """Convert an OpenAI chat-completions request to AI SDK v6 payload."""
     sdk_messages: list[dict] = []
+    system_text = ""
 
     for msg in messages:
         role = msg.get("role", "")
         content = msg.get("content", "")
 
         if role == "system":
-            # Inject as AI SDK system message in the messages array.
-            # convertToModelMessages() handles role:"system" and forwards
-            # it as a model-level system message — bypasses the server's
-            # missing top-level "system" param in streamText().
+            # Collect system prompt text; upstream now accepts a top-level
+            # "system" field (max 4000 chars) in addition to in-message system.
             text = content if isinstance(content, str) else ""
             if text:
-                sdk_messages.append({
-                    "role": "system",
-                    "parts": [{"type": "text", "text": text}],
-                    "metadata": {"custom": {}},
-                    "id": _gen_id("sys"),
-                })
+                system_text = text[:MAX_SYSTEM_LENGTH] if text else ""
             continue
 
         if role == "user":
@@ -182,7 +183,7 @@ def openai_to_ai_sdk(
                 break
 
     return {
-        "system": "",
+        "system": system_text,
         "config": {"modelName": _resolve_model(model)},
         "tools": _convert_tools(tools),
         "id": _gen_id("thread"),

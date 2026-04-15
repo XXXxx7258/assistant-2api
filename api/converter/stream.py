@@ -35,18 +35,23 @@ def _make_chunk(
 
 
 def _extract_usage(event: dict) -> dict | None:
-    """Extract usage from finish event (handles both /api/chat and /api/doc/chat)."""
+    """Extract usage from finish event.
+
+    Upstream formats (checked in priority order):
+    1. messageMetadata.usage (current /api/chat — totalUsage from streamText)
+    2. messageMetadata.custom.usage (legacy /api/doc/chat)
+    """
     meta = event.get("messageMetadata", {})
-    # /api/doc/chat nests under custom.usage
-    raw = meta.get("custom", {}).get("usage")
-    # /api/chat puts usage directly in messageMetadata
+    # Current format: usage directly in messageMetadata
+    raw = meta.get("usage")
+    # Legacy format: nested under custom.usage
     if not raw:
-        raw = meta.get("usage")
+        raw = meta.get("custom", {}).get("usage")
     if not raw:
         return None
     return {
-        "prompt_tokens": raw.get("inputTokens", 0),
-        "completion_tokens": raw.get("outputTokens", 0),
+        "prompt_tokens": raw.get("promptTokens", 0) or raw.get("inputTokens", 0),
+        "completion_tokens": raw.get("completionTokens", 0) or raw.get("outputTokens", 0),
         "total_tokens": raw.get("totalTokens", 0),
     }
 
